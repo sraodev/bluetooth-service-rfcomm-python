@@ -4,7 +4,7 @@ This application connects two devices over Bluetooth and allows one to send mess
 
 ## Getting Started
 
-How to setup a bluetooth server in a Raspberry Pi so an Linux can connect to it. Raspberry pi Bluetooth interfacing with Linux via RFCOMM BT network.
+How to setup a bluetooth server in a Raspberry Pi so an Linux can connect to it.
 
 ### Pre-quisites
 
