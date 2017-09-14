@@ -1,50 +1,58 @@
-#Bluetooth Services (PyBluez) with Python sockets
+# Bluetooth Services (PyBluez) with RFCOMM sockets
 
 This application connects two devices over Bluetooth and allows one to send messages to the other using json. The sending device runs belClient.py, and the receiving device runs bleServer.py
 
-##BLUETOOTH COMMUNICATION BETWEEN RASPBERRY PI AND LINUX
+## Getting Started
 
 How to setup a bluetooth server in a Raspberry Pi so an Linux can connect to it. Raspberry pi Bluetooth interfacing with Linux via RFCOMM BT network.
 
-##Pre-quisites
+### Pre-quisites
 
 This python-script uses Bluez, Linux's Bluetooth protocol stack, we'll be using PyBluez, a Python API for accessing the bluetooth resources using the bluez protocol.
 
-Installation
----
-`sudo apt-get install python-pip python-dev ipython`
+### Installation
 
-`sudo apt-get install bluetooth libbluetooth-dev`
+```
+sudo apt-get install python-pip python-dev ipython
 
-`sudo apt-get install bluez-utils blueman`
+sudo apt-get install bluetooth libbluetooth-dev
 
-`sudo apt-get install bluez python-bluez`
+sudo apt-get install bluez-utils blueman
 
-`sudo pip install pybluez`
+sudo apt-get install bluez python-bluez
+
+sudo pip install pybluez`
+```
 
 You've installed the Python 2 version of the bluez bindings. Either run the script using python2 or install the Python 3 bindings. Since they aren't packaged, you would need to install them using pip:
 
-`sudo python3 -m pip install pybluez`
+```
+sudo python3 -m pip install pybluez`
+```
 
-##Setup your Raspberry Pi
+### Setup your Raspberry Pi
 
-Make your device discoverable
+#### Make your device discoverable
+```
+sudo hciconfig hci0 piscan
+```
 
-`sudo hciconfig hci0 piscan`
+#### Scanning for devices run the inquiry example:
+```
+sudo python inquiry.py
+```
 
-##Scanning for devices run the inquiry example:
+#### Running the Bluetooth Server on RaspberryPi:
+```
+sudo python bleServer.py
+```
 
-`sudo python inquiry.py`
+#### Running the Bluetooth Client on Linux box:
+```
+sudo python bleClient.py
+```
 
-##Running the Bluetooth Server on RaspberryPi:
-
-`sudo python bleServer.py`
-
-##Running the Bluetooth Client on Linux box:
-
-`sudo python bleClient.py`
-
-##Known Issues
+## Known Issues
 
 ```
 Traceback (most recent call last):
@@ -55,7 +63,7 @@ Traceback (most recent call last):
 bluetooth.btcommon.BluetoothError: (2, 'No such file or directory')
 ```
 
-##Possible fixes
+## Possible fixes
 
 Make sure you are using sudo when running the python script
 Make sure you have the serial profile loaded. How to enable the serial profile.
@@ -64,28 +72,37 @@ As it turns out, the culprit is bluetoothd, the Bluetooth daemon. Using SDP with
 
 You need to run the Bluetooth daemon in 'compatibility' mode. Edit /lib/systemd/system/bluetooth.service and add '-C' after 'bluetoothd'. Reboot.
 
-`sudo sdptool add SP`
+```
+sudo sdptool add SP
+```
 
 Or
 
 Find location of bluetooth.service by:
 
-`systemctl status bluetooth.service`
-
+```
+systemctl status bluetooth.service
+```
 Then edit bluetooth.service and look for ExecStart=/usr/libexec/bluetooth/bluetoothd
 Append --compat at the end of this line, save, and then run
 
-`service bluetooth start`
+```
+service bluetooth start
+```
 
 If all goes well, you should be able to successfully run
 
-`sudo sdptool browse local`
+```
+sudo sdptool browse local
+```
 
 Finally, reset the adapter:
 
-`sudo hciconfig -a hci0 reset`
+```
+sudo hciconfig -a hci0 reset
+```
 
-##Reference
+## Reference
 
 [Bluetooth Programming with Python 3](http://blog.kevindoran.co/bluetooth-programming-with-python-3)
 
