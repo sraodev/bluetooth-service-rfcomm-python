@@ -102,12 +102,14 @@ Finally, reset the adapter:
 sudo hciconfig -a hci0 reset
 ```
 
+<!-- CONTRIBUTING -->
+## Contributing
+
+Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any contributions you make are **greatly appreciated**. Please read the [contribution guidelines](https://github.com/sraodev/super-opensource-cheat-sheets/blob/master/contributing.md) first.
+
 ## Reference
 
 [Bluetooth Programming with Python 3](http://blog.kevindoran.co/bluetooth-programming-with-python-3)
-
 [Bluetooth programming with Python - PyBluez](https://people.csail.mit.edu/albert/bluez-intro/x232.html)
-
 [Bluetooth for Programmers](http://people.csail.mit.edu/rudolph/Teaching/Articles/PartOfBTBook.pdf)
-
 [Bluetooth Python extension module](https://github.com/karulis/pybluez)
