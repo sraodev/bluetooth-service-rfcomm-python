@@ -110,6 +110,9 @@ Contributions are what make the open source community such an amazing place to b
 ## Reference
 
 [Bluetooth Programming with Python 3](http://blog.kevindoran.co/bluetooth-programming-with-python-3)
+
 [Bluetooth programming with Python - PyBluez](https://people.csail.mit.edu/albert/bluez-intro/x232.html)
+
 [Bluetooth for Programmers](http://people.csail.mit.edu/rudolph/Teaching/Articles/PartOfBTBook.pdf)
+
 [Bluetooth Python extension module](https://github.com/karulis/pybluez)
