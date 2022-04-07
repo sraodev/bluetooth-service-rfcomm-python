@@ -1,4 +1,4 @@
-# Bluetooth IoT Services (PyBluez) with RFCOMM sockets
+# Bluetooth Service (PyBluez) with RFCOMM sockets
 
 This application connects two devices over Bluetooth and allows one to send messages to the other using json. The sending device runs bleClient.py, and the receiving device runs bleServer.py
 
