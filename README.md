@@ -27,7 +27,7 @@ sudo pip install pybluez`
 You've installed the Python 2 version of the bluez bindings. Either run the script using python2 or install the Python 3 bindings. Since they aren't packaged, you would need to install them using pip:
 
 ```
-sudo python3 -m pip install git+https://github.com/pybluez/pybluez.git`
+sudo python3 -m pip install git+https://github.com/pybluez/pybluez.git
 ```
 
 ### Setup your Raspberry Pi
