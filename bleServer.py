@@ -58,7 +58,7 @@ class bleServer:
         try:
             self.server_socket.bind(("", bluetooth.PORT_ANY))
             logger.info(
-                "Bluetooth server socket bind successfully on host " " to PORT_ANY..."
+                "Bluetooth server socket bind successfully on host '' to PORT_ANY..."
             )
         except (
             Exception,
@@ -147,6 +147,7 @@ class bleServer:
                     self.client_socket.send("EmptyBufferResend")
                 # remove the length bytes from the front of buffer
                 # leave any remaining bytes in the buffer!
+                print("Incoming data")
                 dataSizeStr, _, data = data.partition(":")
                 dataSize = int(dataSizeStr)
                 if len(data) < dataSize:
