@@ -52,12 +52,12 @@ class bleClient:
     def getBluetoothServices(self):
         """Get BT service"""
         try:
-            logger.info("Searching for  Bluetooth services ...")
+            logger.info("Searching for Bluetooth services ...")
             for reConnect in range(2, 4):
                 bleService = find_service(uuid=self.uuid, address=self.addr)
                 if len(bleService) == 0:
                     logger.info(
-                        "Re-connecting  Bluetooth services : %d attempt", reConnect
+                        "Re-connecting Bluetooth services : %d attempt", reConnect
                     )
                 else:
                     break
@@ -80,6 +80,9 @@ class bleClient:
                 "Couldn't find the RaspberryPi Bluetooth service : Invalid uuid",
                 exc_info=True,
             )
+            return False
+
+        return True
 
     def getBluetoothSocket(self):
         """Get the BT socket"""
@@ -181,7 +184,10 @@ class bleClient:
     def start(self):
         """Start the BT interface"""
         # Search for the RaspberryPi Bluetooth service
-        self.getBluetoothServices()
+        res = self.getBluetoothServices()
+        if not res:
+            logger.error("Failed to get bluetooth services")
+            sys.exit(0)
         # Create the client socket
         self.getBluetoothSocket()
         # Connect to bluetooth service
