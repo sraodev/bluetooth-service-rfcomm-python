@@ -110,29 +110,45 @@ class bleClient:
 
     def getBluetoothConnection(self):
         """Get the BT connection"""
-        try:
-            ble_service_info = self.ble_service[0]
-            msg = 'Connecting to "%s" on %s with port %s' % (
-                ble_service_info["name"],
-                ble_service_info["host"],
-                ble_service_info["port"],
-            )
-            logger.info(msg)
-            self.client_socket.connect(
-                (ble_service_info["host"], ble_service_info["port"])
-            )
-            logger.info("Connected successfully to %s " % (ble_service_info["name"]))
-        except (
-            Exception,
-            bluetooth.BluetoothError,
-            SystemExit,
-            KeyboardInterrupt,
-        ) as _:
-            msg = f'Failed to connect to "{ble_service_info["name"]}" on address {ble_service_info["host"]} with port {ble_service_info["port"]}'
-            logger.error(
-                msg,
-                exc_info=True,
-            )
+        ble_service_info = self.ble_service[0]
+        msg = (
+            f'Connecting to "{ble_service_info["name"]}" on '
+            f'{ble_service_info["host"]} with port {ble_service_info["port"]}'
+        )
+        logger.info(msg)
+
+        attempt = 0
+        # Retry a few times
+        while True:
+            attempt += 1
+
+            try:
+                self.client_socket.connect(
+                    (ble_service_info["host"], ble_service_info["port"])
+                )
+                msg = f"Connected successfully to {ble_service_info['name']}"
+                logger.info(msg)
+                break
+            except (
+                Exception,
+                bluetooth.BluetoothError,
+                SystemExit,
+                KeyboardInterrupt,
+            ) as _:
+                msg = (
+                    f'Failed to connect to "{ble_service_info["name"]}" on '
+                    f'address {ble_service_info["host"]} with port {ble_service_info["port"]}'
+                )
+                logger.error(
+                    msg,
+                    exc_info=True,
+                )
+
+                time.sleep(1)
+                if attempt > 5:
+                    return False
+
+        return True
 
     def readJsonFile(self):
         """Read JSON file"""
@@ -159,11 +175,14 @@ class bleClient:
                 "Failed to convert json object  to serialized string", exc_info=True
             )
 
-    def sendData(self, _serialized_data):
+    def sendData(self, serialized_data):
         """Send data via BT"""
         try:
             logger.info("Sending data over bluetooth connection")
-            _serialized_data = str(len(_serialized_data)) + ":" + _serialized_data
+            _serialized_data = b""
+            _serialized_data += len(serialized_data).to_bytes(2, "little")
+            _serialized_data += b":"
+            _serialized_data += serialized_data
             self.client_socket.send(_serialized_data)
             time.sleep(0.5)
             while True:
@@ -206,7 +225,10 @@ class bleClient:
         # Create the client socket
         self.getBluetoothSocket()
         # Connect to bluetooth service
-        self.getBluetoothConnection()
+        res = self.getBluetoothConnection()
+        if not res:
+            logger.error("Failed to get bluetooth connection")
+            sys.exit(0)
 
     def send(self):
         """Send content"""
