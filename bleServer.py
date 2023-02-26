@@ -3,7 +3,7 @@
 # File: bleServer.py
 # Auth: P Srinivas Rao
 # Desc: Bluetooth server application that uses RFCOMM sockets
-
+import sys
 import os
 import logging
 import logging.config
@@ -51,6 +51,8 @@ class bleServer:
             )
         except (bluetooth.BluetoothError, SystemExit, KeyboardInterrupt) as _:
             logger.error("Failed to create the bluetooth server socket ", exc_info=True)
+            return False
+        return True
 
     def getBluetoothConnection(self):
         try:
@@ -67,6 +69,8 @@ class bleServer:
             logger.error(
                 "Failed to bind server socket on host to PORT_ANY ... ", exc_info=True
             )
+            return False
+
         try:
             self.server_socket.listen(1)
             logger.info(
@@ -81,15 +85,26 @@ class bleServer:
             logger.error(
                 "Failed to put server socket to listening mode  ... ", exc_info=True
             )
+            return False
         try:
             port = self.server_socket.getsockname()[1]
-            logger.info("Waiting for connection on RFCOMM channel %d" % (port))
-        except (Exception, BluetoothError, SystemExit, KeyboardInterrupt) as _:
+            msg = "Waiting for connection on RFCOMM channel %d" % (port)
+            logger.info(msg)
+        except (
+            Exception,
+            bluetooth.BluetoothError,
+            SystemExit,
+            KeyboardInterrupt,
+        ) as _:
             logger.error(
                 "Failed to get connection on RFCOMM channel  ... ", exc_info=True
             )
+            return False
+
+        return True
 
     def advertiseBluetoothService(self):
+        """Advertise BT service"""
         try:
             bluetooth.advertise_service(
                 self.server_socket,
@@ -99,7 +114,8 @@ class bleServer:
                 profiles=[bluetooth.SERIAL_PORT_PROFILE],
                 #                   protocols = [ OBEX_UUID ]
             )
-            logger.info("%s advertised successfully ..." % (self.service_name))
+            msg = "%s advertised successfully ..." % (self.service_name)
+            logger.info(msg)
         except (
             Exception,
             bluetooth.BluetoothError,
@@ -107,6 +123,9 @@ class bleServer:
             KeyboardInterrupt,
         ) as _:
             logger.error("Failed to advertise bluetooth services  ... ", exc_info=True)
+            return False
+
+        return True
 
     def acceptBluetoothConnection(self):
         try:
@@ -177,11 +196,17 @@ class bleServer:
 
     def start(self):
         # Create the server socket
-        self.getBluetoothSocket()
+        res = self.getBluetoothSocket()
+        if not res:
+            sys.exit(0)
         # get bluetooth connection to port # of the first available
-        self.getBluetoothConnection()
+        res = self.getBluetoothConnection()
+        if not res:
+            sys.exit(0)
         # advertising bluetooth services
-        self.advertiseBluetoothService()
+        res = self.advertiseBluetoothService()
+        if not res:
+            sys.exit(0)
         # Accepting bluetooth connection
         self.acceptBluetoothConnection()
 
