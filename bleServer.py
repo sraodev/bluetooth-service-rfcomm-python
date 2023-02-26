@@ -147,9 +147,9 @@ class bleServer:
                     self.client_socket.send("EmptyBufferResend")
                 # remove the length bytes from the front of buffer
                 # leave any remaining bytes in the buffer!
-                dataSizeStr, _, data = data.partition(b":")
-                dataSize = int(dataSizeStr)
-                if len(data) < dataSize:
+                data_size_str, _, data = data.partition(b":")
+                data_size = int.from_bytes(data_size_str, "little")
+                if len(data) < data_size:
                     self.client_socket.send("CorruptedBufferResend")
                 else:
                     self.client_socket.send("DataRecived")
