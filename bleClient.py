@@ -76,7 +76,12 @@ class bleClient:
                 logger.info("Port\t\t: %s", ble_service[0]["port"])
                 logger.info("Description\t: %s", ble_service[0]["description"])
                 self.ble_service = ble_service
-        except (Exception, bluetooth.BluetoothError, SystemExit, KeyboardInterrupt) as _:
+        except (
+            Exception,
+            bluetooth.BluetoothError,
+            SystemExit,
+            KeyboardInterrupt,
+        ) as _:
             logger.error(
                 "Couldn't find the RaspberryPi Bluetooth service : Invalid uuid",
                 exc_info=True,
@@ -92,7 +97,12 @@ class bleClient:
             logger.info(
                 "Bluetooth client socket successfully created for RFCOMM service ... "
             )
-        except (Exception, bluetooth.BluetoothError, SystemExit, KeyboardInterrupt) as _:
+        except (
+            Exception,
+            bluetooth.BluetoothError,
+            SystemExit,
+            KeyboardInterrupt,
+        ) as _:
             logger.error(
                 "Failed to create the bluetooth client socket for RFCOMM service ... ",
                 exc_info=True,
@@ -112,7 +122,12 @@ class bleClient:
                 (ble_service_info["host"], ble_service_info["port"])
             )
             logger.info("Connected successfully to %s " % (ble_service_info["name"]))
-        except (Exception, bluetooth.BluetoothError, SystemExit, KeyboardInterrupt) as _:
+        except (
+            Exception,
+            bluetooth.BluetoothError,
+            SystemExit,
+            KeyboardInterrupt,
+        ) as _:
             msg = f'Failed to connect to "{ble_service_info["name"]}" on address {ble_service_info["host"]} with port {ble_service_info["port"]}'
             logger.error(
                 msg,
@@ -173,7 +188,12 @@ class bleClient:
         try:
             self.client_socket.close()
             logger.info("Bluetooth client socket successfully closed ...")
-        except (Exception, bluetooth.BluetoothError, SystemExit, KeyboardInterrupt) as _:
+        except (
+            Exception,
+            bluetooth.BluetoothError,
+            SystemExit,
+            KeyboardInterrupt,
+        ) as _:
             logger.error("Failed to close the bluetooth client socket ", exc_info=True)
 
     def start(self):
