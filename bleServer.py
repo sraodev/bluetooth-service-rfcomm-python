@@ -147,8 +147,7 @@ class bleServer:
                     self.client_socket.send("EmptyBufferResend")
                 # remove the length bytes from the front of buffer
                 # leave any remaining bytes in the buffer!
-                print("Incoming data")
-                dataSizeStr, _, data = data.partition(":")
+                dataSizeStr, _, data = data.partition(b":")
                 dataSize = int(dataSizeStr)
                 if len(data) < dataSize:
                     self.client_socket.send("CorruptedBufferResend")
@@ -214,6 +213,11 @@ class bleServer:
     def receive(self):
         # receive data
         data_recv = self.recvData()
+        # print(f"{data_recv=}")
+        
+        if data_recv is None:
+            logger.error("Failed to handle incoming data")
+            return
         # de-serializing data
         self.deserializedData(data_recv)
         # Writing json object to the file
