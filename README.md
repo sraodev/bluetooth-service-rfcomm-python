@@ -1,55 +1,89 @@
-# Bluetooth Service (PyBluez) with RFCOMM sockets
+# Universal Bluetooth SDK
 
-This application connects two devices over Bluetooth and allows one to send messages to the other using json. The sending device runs bleClient.py, and the receiving device runs bleServer.py
+Cross-language, multi-service toolkit for building Bluetooth solutions (RFCOMM
+today, BLE-ready tomorrow). The Python SDK is production-ready; other folders
+are scaffolding for future Go/Rust SDKs, microservices, and CLI tooling.
 
-## Getting Started
-
-How to setup a bluetooth server in a Raspberry Pi so an Linux can connect to it.
-
-### Pre-quisites
-
-This python-script uses Bluez, Linux's Bluetooth protocol stack, we'll be using PyBluez, a Python API for accessing the bluetooth resources using the bluez protocol.
-
-### Installation
+## Repository layout
 
 ```
-sudo apt-get install python-pip python-dev ipython
-
-sudo apt-get install bluetooth libbluetooth-dev
-
-sudo apt-get install bluez-utils blueman
-
-sudo apt-get install bluez python-bluez
-
-sudo pip install pybluez`
+.
+├── sdk/
+│   ├── python/          # fully implemented PyBluez SDK
+│   ├── go/              # placeholder for Go SDK
+│   └── rust/            # placeholder for Rust SDK
+├── microservices/
+│   ├── grpc-server/     # future gRPC control-plane
+│   └── rest-server/     # future REST façade
+├── cli/
+│   └── ubtctl/          # future CLI tool
+├── examples/            # scenario-specific samples
+├── common/              # shared protocols & schemas
+└── docs/                # architecture & guides
 ```
 
-You've installed the Python 2 version of the bluez bindings. Either run the script using python2 or install the Python 3 bindings. Since they aren't packaged, you would need to install them using pip:
+## Python SDK (sdk/python)
+
+### Prerequisites
+
+PyBluez + BlueZ on Linux (tested on Raspberry Pi OS / Ubuntu). Install via the
+helper script:
+
+```bash
+cd sdk/python
+sudo ./scripts/install_dependencies.sh
+```
+
+Or install packages manually (Debian/Ubuntu):
 
 ```
-sudo python3 -m pip install pybluez`
+sudo apt-get install python3 python3-dev python3-pip ipython3
+sudo apt-get install bluetooth libbluetooth-dev bluez bluez-tools blueman
+sudo python3 -m pip install pybluez
 ```
 
-### Setup your Raspberry Pi
+### Usage
 
-#### Make your device discoverable
+Run commands from `sdk/python` (or set `PYTHONPATH` accordingly).
+
+1. **Start the server (e.g., on Raspberry Pi)**
+   ```bash
+   cd sdk/python
+   sudo python3 run_server.py
+   ```
+   - Customize behaviour via `bluetooth_service/config.py` (`ServerSettings`).
+   - Use `LOG_CFG=/path/to/logger.json` to override the default logger config.
+
+2. **Send data from the client**
+   ```bash
+    cd sdk/python
+    sudo python3 run_client.py
+   ```
+   - Update `bluetooth_service/client_config.py` for UUID, discovery retries,
+     payload source, etc.
+   - Default payload is `text.json`; inject your own `DataSource` for custom
+     payloads.
+
+3. **Run unit tests (no Bluetooth hardware required)**
+   ```bash
+   cd sdk/python
+   python3 -m pip install pytest
+   pytest tests/
+   ```
+   Tests use socket stubs to stay deterministic on any host.
+
+## Platform setup tips
+
+Make your Raspberry Pi discoverable:
+
 ```
 sudo hciconfig hci0 piscan
 ```
 
-#### Scanning for devices run the inquiry example:
+Run the classic inquiry example (optional):
+
 ```
 sudo python inquiry.py
-```
-
-#### Running the Bluetooth Server on RaspberryPi:
-```
-sudo python bleServer.py
-```
-
-#### Running the Bluetooth Client on Linux box:
-```
-sudo python bleClient.py
 ```
 
 ## Known Issues
@@ -101,6 +135,13 @@ Finally, reset the adapter:
 ```
 sudo hciconfig -a hci0 reset
 ```
+
+## Roadmap
+
+- Flesh out Go/Rust SDKs under `sdk/`.
+- Build microservices (gRPC + REST) that wrap the SDK for remote control.
+- Ship `ubtctl` CLI for device management.
+- Provide ready-to-run examples (chat, sensor stream, file transfer).
 
 <!-- CONTRIBUTING -->
 ## Contributing
