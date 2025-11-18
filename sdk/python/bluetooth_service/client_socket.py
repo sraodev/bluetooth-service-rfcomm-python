@@ -56,6 +56,13 @@ class ClientSocketManager:
             self._socket.connect(endpoint)
             logger.info("Connected to %s", self._service_info["name"])
         except (BluetoothError, OSError) as exc:
+            if self._socket is not None:
+                try:
+                    self._socket.close()
+                except BluetoothError as close_exc:
+                    logger.warning("Failed to close socket after connect error: %s", close_exc)
+                finally:
+                    self._socket = None
             raise BluetoothServerError("Unable to connect to Bluetooth service", cause=exc)
         finally:
             if self._socket is not None:
@@ -80,7 +87,10 @@ class ClientSocketManager:
             raise BluetoothServerError("Failed to receive data", cause=exc)
         finally:
             if self._socket:
-                self._socket.settimeout(None)
+                try:
+                    self._socket.settimeout(None)
+                except (BluetoothError, OSError) as exc:
+                    logger.warning("Failed to reset socket timeout: %s", exc)
 
     def close(self) -> None:
         if not self._socket:
