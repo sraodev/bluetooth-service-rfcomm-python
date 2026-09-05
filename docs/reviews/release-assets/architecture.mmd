@@ -1,0 +1,46 @@
+%%{init: {"theme":"base","themeVariables":{"fontFamily":"Arial, sans-serif","primaryColor":"#E8F0FE","primaryTextColor":"#172B4D","primaryBorderColor":"#1A73E8","lineColor":"#5F6368","secondaryColor":"#E6F4EA","tertiaryColor":"#FEF7E0"},"flowchart":{"curve":"basis","htmlLabels":true}}}%%
+flowchart TB
+    subgraph Source[Existing Go entry points]
+        direction LR
+        U[cli/ubtctl<br/>ubt + ubtctl]
+        D[daemon/ubtd<br/>ubtd]
+    end
+
+    subgraph Build[GoReleaser artifact contract]
+        direction LR
+        M[darwin + linux<br/>amd64 + arm64]
+        V[Tag-derived version<br/>CGO disabled · trimpath]
+        A[4 tar.gz archives<br/>3 binaries + README.md + LICENSE.txt]
+        H[checksums.txt<br/>SHA-256]
+        M --> V --> A
+        A --> H
+    end
+
+    subgraph Publish[Protected publication path]
+        direction LR
+        T[Semantic version tag<br/>commit in master history]
+        W[Release workflow<br/>job-scoped contents: write]
+        G[GitHub Release]
+        T --> W --> G
+    end
+
+    U --> M
+    D --> M
+    A --> G
+    H --> G
+
+    subgraph Future[Separate follow-up issues]
+        direction LR
+        C[curl installer #41]
+        I[mise #42]
+        B[Homebrew #43]
+        S[Stable URL #44]
+    end
+
+    G -. verified asset contract .-> C
+    G -. verified asset contract .-> I
+    G -. verified asset contract .-> B
+    C -. installer endpoint .-> S
+
+    classDef future fill:#FCE8E6,stroke:#D93025,color:#7A1B16,stroke-width:1.5px;
+    class C,I,B,S future;

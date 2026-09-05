@@ -1,0 +1,15 @@
+%%{init: {"theme":"base","themeVariables":{"fontFamily":"Arial, sans-serif","primaryColor":"#E8F0FE","primaryTextColor":"#172B4D","primaryBorderColor":"#1A73E8","lineColor":"#5F6368","secondaryColor":"#E6F4EA","tertiaryColor":"#FEF7E0"},"flowchart":{"curve":"basis","htmlLabels":true}}}%%
+flowchart TB
+    S([Start with scope]) --> G[1. Artifact contract<br/>.goreleaser.yml]
+    G --> R[2. Publication boundary<br/>release.yml]
+    R --> C[3. Non-publishing proof<br/>CI snapshot]
+    C --> E{Evidence complete?}
+    E -->|Yes| D[Review diagrams<br/>and limits]
+    D --> M([Merge decision])
+    E -->|No| F[Request focused fix]
+    F --> G
+
+    X[Out of scope<br/>installer · mise · Homebrew<br/>signing · Windows · hardware]:::excluded
+    S -. keep separate .-> X
+
+    classDef excluded fill:#FCE8E6,stroke:#D93025,color:#7A1B16,stroke-width:2px;
