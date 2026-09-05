@@ -12,3 +12,4 @@ venv/
 # Private example output and local tooling
 /draft.txt
 .pytest_cache/
+/dist/

@@ -30,3 +30,37 @@ jobs:
           python-version: '3.12'
       - run: python3 scripts/smoke.py
       - run: python3 -m unittest discover -s examples/chat -p 'test_*.py' -v
+  release-snapshot:
+    name: Release snapshot
+    runs-on: ubuntu-latest
+    env:
+      GORELEASER_VERSION: v2.18.0
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+      - uses: goreleaser/goreleaser-action@e435ccd777264be153ace6237001ef4d979d3a7a # v6
+        with:
+          distribution: goreleaser
+          version: ${{ env.GORELEASER_VERSION }}
+          args: release --snapshot --clean
+      - name: Verify release bundle matrix
+        shell: bash
+        run: |
+          expected_members=$'LICENSE.txt\nREADME.md\nubt\nubtctl\nubtd'
+          for os in darwin linux; do
+            for arch in amd64 arm64; do
+              archive="dist/universal-bluetooth-sdk_${os}_${arch}.tar.gz"
+              test -f "$archive"
+              actual_members="$(tar -tzf "$archive" | LC_ALL=C sort)"
+              if [[ "$actual_members" != "$expected_members" ]]; then
+                echo "Unexpected members in $archive:" >&2
+                printf '%s\n' "$actual_members" >&2
+                exit 1
+              fi
+            done
+          done
+          (cd dist && sha256sum --check checksums.txt)

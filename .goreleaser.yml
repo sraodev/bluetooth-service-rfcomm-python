@@ -1,0 +1,62 @@
+version: 2
+project_name: universal-bluetooth-sdk
+
+before:
+  hooks:
+    - go mod download
+
+builds:
+  - id: ubt
+    main: ./cli/ubtctl
+    binary: ubt
+    env: [CGO_ENABLED=0]
+    goos: [darwin, linux]
+    goarch: [amd64, arm64]
+    flags: [-trimpath]
+    ldflags:
+      - -s -w
+      - -X main.cliVersion={{ .Tag }}
+  - id: ubtctl
+    main: ./cli/ubtctl
+    binary: ubtctl
+    env: [CGO_ENABLED=0]
+    goos: [darwin, linux]
+    goarch: [amd64, arm64]
+    flags: [-trimpath]
+    ldflags:
+      - -s -w
+      - -X main.cliVersion={{ .Tag }}
+  - id: ubtd
+    main: ./cli/ubtd
+    binary: ubtd
+    env: [CGO_ENABLED=0]
+    goos: [darwin, linux]
+    goarch: [amd64, arm64]
+    flags: [-trimpath]
+    ldflags:
+      - -s -w
+      - -X main.daemonVersion={{ .Tag }}
+
+archives:
+  - id: cli
+    ids: [ubt, ubtctl, ubtd]
+    formats: [tar.gz]
+    name_template: "universal-bluetooth-sdk_{{ .Os }}_{{ .Arch }}"
+    files:
+      - README.md
+      - LICENSE.txt
+
+checksum:
+  name_template: checksums.txt
+  algorithm: sha256
+
+release:
+  github:
+    owner: sraodev
+    name: universal-bluetooth-sdk
+  name_template: "Universal Bluetooth SDK {{ .Tag }}"
+  draft: false
+  prerelease: auto
+
+snapshot:
+  version_template: "{{ incpatch .Version }}-next"
