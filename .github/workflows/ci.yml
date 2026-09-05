@@ -50,13 +50,17 @@ jobs:
       - name: Verify release bundle matrix
         shell: bash
         run: |
+          expected_members=$'LICENSE.txt\nREADME.md\nubt\nubtctl\nubtd'
           for os in darwin linux; do
             for arch in amd64 arm64; do
               archive="dist/universal-bluetooth-sdk_${os}_${arch}.tar.gz"
               test -f "$archive"
-              for binary in ubt ubtctl ubtd; do
-                tar -tzf "$archive" | grep -Fx "$binary"
-              done
+              actual_members="$(tar -tzf "$archive" | LC_ALL=C sort)"
+              if [[ "$actual_members" != "$expected_members" ]]; then
+                echo "Unexpected members in $archive:" >&2
+                printf '%s\n' "$actual_members" >&2
+                exit 1
+              fi
             done
           done
           (cd dist && sha256sum --check checksums.txt)
