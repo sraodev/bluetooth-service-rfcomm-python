@@ -22,6 +22,7 @@ class ServerSettings:
     # Acknowledgement / retry protocol messages
     resend_empty_message: str = "EmptyBufferResend"
     resend_corrupt_message: str = "CorruptedBufferResend"
+    delimiter_missing_message: str = "DelimiterMissingBufferResend"
     acknowledge_message: str = "DataReceived"
 
     # Timeouts (seconds). None means blocking behaviour.

@@ -114,3 +114,29 @@ def test_server_requests_retry_on_corrupt_payload() -> None:
     assert socket_manager.sent_messages[-1] == b"DataReceived"
     assert sink.persisted == [{"message": "data"}]
 
+
+
+def test_server_requests_resend_on_missing_delimiter() -> None:
+    # First payload has no length delimiter -> should request a resend and
+    # recover, not raise and end the session.
+    socket_manager = StubSocketManager(
+        payloads=[
+            b"no-delimiter-here",
+            b"4:data",
+        ]
+    )
+    sink = StubSink()
+    server = BluetoothServer(
+        ServerSettings(),
+        deserializer=StubDeserializer(output={"message": "data"}),
+        sink=sink,
+        socket_manager=socket_manager,
+    )
+
+    server.start()
+    result = server.receive_once()
+    server.stop()
+
+    assert b"DelimiterMissingBufferResend" in socket_manager.sent_messages
+    assert socket_manager.sent_messages[-1] == b"DataReceived"
+    assert result == {"message": "data"}

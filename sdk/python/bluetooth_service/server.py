@@ -85,11 +85,16 @@ class BluetoothServer:
                 self._socket_manager.send(self.settings.resend_empty_message)
                 continue
 
-            data_size_str, _, remainder = data.partition(b":")
-            try:
-                data_size = int(data_size_str)
-            except ValueError as exc:
-                raise BluetoothServerError("Invalid length prefix", cause=exc)
+            data_size_str, sep, remainder = data.partition(b":")
+            if not sep or not data_size_str.isdigit():
+                # No length delimiter (or a non-numeric prefix): the frame is
+                # unusable but the session is not. Ask the client to resend
+                # rather than tearing the connection down. The client already
+                # treats delimiter_missing_message as a resend trigger.
+                logger.warning("Missing/invalid length prefix; requesting resend")
+                self._socket_manager.send(self.settings.delimiter_missing_message)
+                continue
+            data_size = int(data_size_str)
 
             if len(remainder) < data_size:
                 logger.warning("Corrupted buffer detected")
